@@ -1,7 +1,20 @@
 table {
+    table-layout: fixed;
     max-width: 90%;
 }
 
 tr {
     height: 10vw;
+}
+
+td {
+    max-width: 30%;
+}
+
+.open {
+    cursor: pointer;
+}
+
+.close {
+    cursor: default;
 }

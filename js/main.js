@@ -54,11 +54,12 @@ function startGame() {
     let table = addElement('table', {'class': 
      'table table-bordered border-dark-subtle border-4 align-middle mx-auto'},
      col3);
+    let tableBody = addElement('tbody', {}, table);
     let tileCount = 0;
     while ( tileCount < 9) {
-        let row = addElement('tr', {}, table);
+        let row = addElement('tr', {}, tableBody);
         for (let i = 0; i < 3; i++) {
-            let tile = addElement('td', {'class':'fs-1', 'id': tileCount},row);
+            let tile = addElement('td', {'class':'fs-1 open', 'id': tileCount},row);
             tile.innerText = "";
             tile.addEventListener('click', makeMove);
             tileCount++;
@@ -114,21 +115,27 @@ function makeMove(event) {
     // update the tile on screen with the right symbol and remove it from play
     event.target.innerText = board[lastMove];
     event.target.removeEventListener('click', makeMove);
+    event.target.className = 'fs-1 close';
 
     console.log(moves);
 
+    // check to see if the last move was a winning one
     if (moves.length >= 5) {
         winningMoves = checkForWin();
     }
+    // check to see if the game has ended
     if (winningMoves || moves.length == 9) {
         endGame(winningMoves);
     }
+    // game has not ended, continue play
     else {
         switchPlayer();
     }
 }
 
 // Checks the current board state to see if a winning move has been made.
+// Returns an array of winning tiles if a winning sequence was found.
+// Returns false if no winning sequence was found.
 function checkForWin() {
     console.log("checkForWin was called!");
     console.log("Number of moves: " + moves.length);
@@ -199,6 +206,7 @@ function endGame(win) {
     console.log(winningMoves);
 
     // change the player message to a victory/tie message
+    // Hide the left/right columns, widen the center column
     let leftMessage = document.getElementById('left-msg');
     leftMessage.className = 'd-none';
     leftMessage.parentElement.className = 'col-2';
@@ -210,19 +218,24 @@ function endGame(win) {
     rightMessage.className = 'd-none';
     rightMessage.parentElement.className = 'col-2';
 
+    // Figure out if the game ended in a player's victory or a tie
     if (win) {
+        // Display the winning player
         if (board[win[0]] == player1Symbol) {
             centerMessage.innerText = "Player 1 Wins!";
         } else {
             centerMessage.innerText = "Player 2 Wins!";
         }
+        // Highlight the winning tiles
         for (const tile of win) {
             document.getElementById(tile).classList.add('bg-info-subtle');
         }
+        // Remove any unfilled tiles from play
         if (remainingMoves.length > 0) {
-            for (const tile of remainingMoves) {
-                document.getElementById(tile).removeEventListener('click',
-                 makeMove);
+            for (const move of remainingMoves) {
+                let tile = document.getElementById(move);
+                tile.removeEventListener('click',makeMove);
+                tile.className = 'fs-1 close';
             }
         }
     } else {
