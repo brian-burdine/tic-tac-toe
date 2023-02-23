@@ -119,6 +119,7 @@ The HTML page created by startGame will have a structure somewhat like:
     - SET *board* to an array with nine empty strings as values
     - SET *moves* to an empty array
     - SET *remainingMoves* to an array with the numbers 0-8 as values
+    - SET *winningMoves* to `false`
     - END **startGame**
 - **makeMove**(*event*)
   - When called, updates the board by marking the target square with the current player's symbol and removing it from future moves. If the amount of moves is greater than or equal to 5, **checkForWin** is called to see if the game ended with the latest move. If the last move won the game, or if the 9th square was filled, **endGame** is called. If the game didn't end, **switchPlayer** is called to change the displayed player.
@@ -263,3 +264,7 @@ The HTML page created by startGame will have a structure somewhat like:
    - If they have, the winning squares are highlighted and the game ends (**endGame** is called)
    - If not, game continues, but each move is checked for victory
    - If all nine tiles are filled without a winner, a tie is declared and the game ends
+
+   TODO:
+   1. Make table cells uniform sizes/make columns apparent at start
+   2. Making startGame the callback function for the restart button creates a new game board, need to replace the html rather than keep adding (FIXED)
