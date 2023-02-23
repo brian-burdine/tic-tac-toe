@@ -119,6 +119,7 @@ The HTML page created by startGame will have a structure somewhat like:
     - SET *board* to an array with nine empty strings as values
     - SET *moves* to an empty array
     - SET *remainingMoves* to an array with the numbers 0-8 as values
+    - SET *winningMoves* to `false`
     - END **startGame**
 - **makeMove**(*event*)
   - When called, updates the board by marking the target square with the current player's symbol and removing it from future moves. If the amount of moves is greater than or equal to 5, **checkForWin** is called to see if the game ended with the latest move. If the last move won the game, or if the 9th square was filled, **endGame** is called. If the game didn't end, **switchPlayer** is called to change the displayed player.
