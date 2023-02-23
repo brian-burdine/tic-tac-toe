@@ -1,6 +1,6 @@
-const board = ["", "", "", "", "", "", "", "", ""];
-const moves = [];
-const remainingMoves = [0, 1, 2, 3, 4, 5, 6, 7, 8];
+let board = ["", "", "", "", "", "", "", "", ""];
+let moves = [];
+let remainingMoves = [0, 1, 2, 3, 4, 5, 6, 7, 8];
 let winningMoves = false;
 
 let player1Symbol = 'X';
@@ -47,7 +47,7 @@ function startGame() {
     msgRight.innerText = "Player 2's Turn";
     
     // make the board
-    let row3 = addElement('div', {'class': 'row', 'id': 'player-msg'}, main);
+    let row3 = addElement('div', {'class': 'row', 'id': 'board'}, main);
     let col3 = addElement('div', {'class': 'col text-center'}, row3);
     let table = addElement('table', {'class': 
      'table table-bordered border-dark-subtle border-4 align-middle mx-auto'},
@@ -64,7 +64,7 @@ function startGame() {
     }
 
     // make the restart button
-    let row4 = addElement('div', {'class': 'row', 'id': 'player-msg'}, main);
+    let row4 = addElement('div', {'class': 'row', 'id': 'reset'}, main);
     let col4 = addElement('div', {'class': 'col text-center'}, row4);
     let reset = addElement('button',
      {'class': 'btn btn-outline-secondary btn-lg', 'id': 'reset'}, col4);
@@ -78,8 +78,70 @@ function startGame() {
     winningMoves = false;
 }
 
+// The callback function for the event listeners on the table cells used to
+// represent game spaces.
+// Adds the clicked space to the list of moves made and updates the board with
+// the current player's symbol.
+// Once the number of moves is 5 or higher, checkForWin is called to see if the
+// last move won the game.
+// If it did, or the number of moves has reached 9, endGame is called to end
+// the game. Otherwise, switchPlayer is called to change the display to reflect
+// the current player.
 function makeMove(event) {
     console.log(event.target.id + " was clicked!");
+
+    // update game state
+    moves.push(Number(event.target.id));
+    remainingMoves = remainingMoves.filter(move => { 
+        return move != moves[moves.length - 1];});
+    if ((moves.length % 2) == 1) {
+        board[moves[moves.length - 1]] = player1Symbol;
+    } else {
+        board[moves[moves.length - 1]] = player2Symbol;
+    }
+
+    event.target.innerText = board[moves[moves.length - 1]];
+    event.target.removeEventListener('click', makeMove);
+
+    console.log(moves);
+
+    if (moves.length >= 5) {
+        winningMoves = checkForWin();
+    }
+    if (winningMoves || moves.length == 9) {
+        endGame(winningMoves);
+    }
+    else {
+        switchPlayer();
+    }
+}
+
+function checkForWin() {
+    console.log("checkForWin was called!");
+    console.log("Number of moves: " + moves.length);
+}
+
+// Changes the message to the players to accurately display whose turn it
+// currently is.
+function switchPlayer() {
+    let leftMessage = document.getElementById('left-msg');
+    let centerMessage = document.getElementById('center-msg');
+    let rightMessage = document.getElementById('right-msg');
+
+    if ((moves.length % 2) == 0) {
+        leftMessage.className = 'd-block';
+        centerMessage.innerText = player1Symbol;
+        rightMessage.className = 'd-none';
+    } else {
+        leftMessage.className = 'd-none';
+        centerMessage.innerText = player2Symbol;
+        rightMessage.className = 'd-block';
+    }
+}
+
+function endGame(win) {
+    console.log("endGame was called!");
+    console.log("Number of moves: " + moves.length);
 }
 
 // Creates a new HTML element in the DOM of the given type, gives it the

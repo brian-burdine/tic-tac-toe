@@ -264,3 +264,7 @@ The HTML page created by startGame will have a structure somewhat like:
    - If they have, the winning squares are highlighted and the game ends (**endGame** is called)
    - If not, game continues, but each move is checked for victory
    - If all nine tiles are filled without a winner, a tie is declared and the game ends
+
+   TODO:
+   1. Make table cells uniform sizes/make columns apparent at start
+   2. Making startGame the callback function for the restart button creates a new game board, need to replace the html rather than keep adding
