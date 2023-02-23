@@ -267,4 +267,4 @@ The HTML page created by startGame will have a structure somewhat like:
 
    TODO:
    1. Make table cells uniform sizes/make columns apparent at start
-   2. Making startGame the callback function for the restart button creates a new game board, need to replace the html rather than keep adding
+   2. Making startGame the callback function for the restart button creates a new game board, need to replace the html rather than keep adding (FIXED)

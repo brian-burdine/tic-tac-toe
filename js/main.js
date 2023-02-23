@@ -15,9 +15,11 @@ let player2Symbol = 'O';
 function startGame() {
     // get a reference to the target div in the HTML document
     let app = document.getElementById('app');
+    // make a new HTML fragment to contain this game
+    let game = new DocumentFragment();
 
     // make the header
-    let header = addElement('header', {}, app);
+    let header = addElement('header', {}, game);
     let row1 = addElement('div', {'class': 'row'}, header);
     let col1 = addElement('div', {'class': 'col'}, row1);
     let title = addElement('h1', {'class': 'text-center', 'id': 'title'},
@@ -25,7 +27,7 @@ function startGame() {
     title.innerText = "Tic-Tac-Toe";
 
     // make the game
-    let main = addElement('main', {}, app);
+    let main = addElement('main', {}, game);
 
     // make the player message
     // first column: player 1's turn
@@ -71,6 +73,9 @@ function startGame() {
     reset.innerText = "Restart Game";
     reset.addEventListener('click', startGame);
 
+    // replace any contents of target div with the new game
+    app.replaceChildren(game);
+    
     // reset board state
     board = ["", "", "", "", "", "", "", "", ""];
     moves = [];
@@ -88,19 +93,26 @@ function startGame() {
 // the game. Otherwise, switchPlayer is called to change the display to reflect
 // the current player.
 function makeMove(event) {
-    console.log(event.target.id + " was clicked!");
+    // get the clicked tile's number
+    let lastMove = Number(event.target.id);
+    console.log(lastMove + " was clicked!");
 
-    // update game state
-    moves.push(Number(event.target.id));
+    // Update game state
+    // add latest move to the list of moves
+    moves.push(lastMove);
+    // remove latest move from the list of remaining moves
     remainingMoves = remainingMoves.filter(move => { 
-        return move != moves[moves.length - 1];});
+        return move != lastMove;});
+    // set the appropriate player's symbol to that tile in 
+    // the board representation
     if ((moves.length % 2) == 1) {
-        board[moves[moves.length - 1]] = player1Symbol;
+        board[lastMove] = player1Symbol;
     } else {
-        board[moves[moves.length - 1]] = player2Symbol;
+        board[lastMove] = player2Symbol;
     }
 
-    event.target.innerText = board[moves[moves.length - 1]];
+    // update the tile on screen with the right symbol and remove it from play
+    event.target.innerText = board[lastMove];
     event.target.removeEventListener('click', makeMove);
 
     console.log(moves);
@@ -116,9 +128,48 @@ function makeMove(event) {
     }
 }
 
+// Checks the current board state to see if a winning move has been made.
 function checkForWin() {
     console.log("checkForWin was called!");
     console.log("Number of moves: " + moves.length);
+
+    // check the latest move to see which spaces should be checked for win
+    let lastMove = moves[moves.length - 1];
+    let row = Math.floor(lastMove / 3);
+    let col = Math.floor(lastMove % 3);
+    let diag = (lastMove % 2) == 0;
+
+    // make an array to include winning tiles
+    let win = [];
+
+    // check the row of the latest move
+    if (board[row * 3] === board[row * 3 + 1] && board[row * 3] ===
+        board[row * 3 + 2]) 
+    {
+        win.push(row * 3, row * 3 + 1, row * 3 + 2);
+    }
+    
+    // check the column of the latest move
+    if (board[col] === board[col + 3] && board[col] === board[col + 6]) {
+        win.push(col, col + 3, col + 6);
+    }
+
+    // if the latest move was in an even-numbered tile, check the diagonals
+    if (diag) {
+        if (board[0] == board[4] && board[0] == board[8]) {
+            win.push(0, 4, 8);
+        } else if (board[2] == board[4] && board[2] == board[6]) {
+            win.push(2, 4, 6);
+        }
+    }
+
+    // if a winning move was found, return the winning tiles; 
+    // otherwise, return false
+    if (win.length > 0) {
+        return win;
+    } else {
+        return false;
+    }
 }
 
 // Changes the message to the players to accurately display whose turn it
@@ -139,9 +190,44 @@ function switchPlayer() {
     }
 }
 
+// Ends the game, either by declaring a player the victor or by declaring a
+// tie game. If a player did win, the winning moves are highlighted. 
+// Any empty tiles become unresponsive.
 function endGame(win) {
     console.log("endGame was called!");
     console.log("Number of moves: " + moves.length);
+    console.log(winningMoves);
+
+    // change the player message to a victory/tie message
+    let leftMessage = document.getElementById('left-msg');
+    leftMessage.className = 'd-none';
+    leftMessage.parentElement.className = 'col-2';
+
+    let centerMessage = document.getElementById('center-msg');
+    centerMessage.parentElement.className = 'col-8 text-center';
+
+    let rightMessage = document.getElementById('right-msg');
+    rightMessage.className = 'd-none';
+    rightMessage.parentElement.className = 'col-2';
+
+    if (win) {
+        if (board[win[0]] == player1Symbol) {
+            centerMessage.innerText = "Player 1 Wins!";
+        } else {
+            centerMessage.innerText = "Player 2 Wins!";
+        }
+        for (const tile of win) {
+            document.getElementById(tile).classList.add('bg-info-subtle');
+        }
+        if (remainingMoves.length > 0) {
+            for (const tile of remainingMoves) {
+                document.getElementById(tile).removeEventListener('click',
+                 makeMove);
+            }
+        }
+    } else {
+        centerMessage.innerText = "Tie game!"
+    }
 }
 
 // Creates a new HTML element in the DOM of the given type, gives it the
