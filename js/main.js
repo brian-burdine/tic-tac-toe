@@ -67,7 +67,7 @@ function startGame() {
     }
 
     // make the restart button
-    let row4 = addElement('div', {'class': 'row', 'id': 'reset'}, main);
+    let row4 = addElement('div', {'class': 'row'}, main);
     let col4 = addElement('div', {'class': 'col text-center'}, row4);
     let reset = addElement('button',
      {'class': 'btn btn-outline-secondary btn-lg', 'id': 'reset'}, col4);
